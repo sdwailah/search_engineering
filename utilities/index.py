@@ -12,6 +12,7 @@ import logging
 from pathlib import Path
 import requests
 import json
+from tqdm import tqdm
 
 from time import perf_counter
 import concurrent.futures
@@ -149,7 +150,8 @@ def index_file(file, index_name, host="localhost", max_docs=2000000, batch_size=
 @click.option('--host', '-o', default="localhost", help="The name of the host running OpenSearch")
 @click.option('--max_docs', '-m', default=200000, help="The maximum number of docs to be indexed PER WORKER PER FILE.")
 @click.option('--batch_size', '-b', default=200, help="The number of docs to send per request. Max of 5000")
-def main(source_dir: str, file_glob: str, index_name: str, workers: int, host: str, max_docs: int, batch_size: int):
+@click.option('--refresh_interval', '-r', default=None, help="The refresh interval for indexing and query freshness. Provide a value with a time unit (e.g., '5s' for 5 seconds) or '-1' to disable.")
+def main(source_dir: str, file_glob: str, index_name: str, workers: int, host: str, max_docs: int, batch_size: int, refresh_interval: str):
     batch_size = min(batch_size, 5000)  # I believe this is the default max batch size, but need to find docs on that
     logger.info(
         f"Indexing {source_dir} to {index_name} with {workers} workers to host {host} with a maximum number of docs sent per worker of {max_docs} and {batch_size} per batch.")
@@ -157,6 +159,8 @@ def main(source_dir: str, file_glob: str, index_name: str, workers: int, host: s
     docs_indexed = 0
     # Set refresh interval to -1
     client = get_opensearch(host)
+    if refresh_interval is not None:
+        client.indices.put_settings(index=index_name, body={"index": {"refresh_interval": refresh_interval}})
     logger.debug(client.indices.get_settings(index=index_name))
     start = perf_counter()
     time_indexing = 0

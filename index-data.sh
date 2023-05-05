@@ -5,13 +5,13 @@ usage()
   exit 2
 }
 
-DATASETS_DIR="/workspace/datasets"
-PYTHON_LOC="/workspace/search_engineering"
+DATASETS_DIR="../datasets"
+PYTHON_LOC="/home/salem/Courses/SearchEngineering/search_engineering"
 WEEK="utilities" #Default indexing is in utilities
-PRODUCTS_JSON_FILE="bbuy_products.json"
+PRODUCTS_JSON_FILE="../week1/bbuy_products.json"
 HOST="localhost"
 INDEX_NAME="bbuy_products"
-LOGS_DIR="/workspace/logs"
+LOGS_DIR="../logs"
 WORKERS=8
 MAX_DOCS=2000000
 BATCH_SIZE=200
